@@ -1,3 +1,3 @@
 [submodule "teamspeak3-nagios"]
-	path = teamspeak3-nagios
+	path = teamspeak3/teamspeak3-nagios
 	url = https://github.com/ext/teamspeak3-nagios
