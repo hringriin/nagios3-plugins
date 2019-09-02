@@ -1,0 +1,52 @@
+#!/bin/bash
+# this plugin will prompt your upsc (nut) for the set ups
+
+# ----- CONFIG {{{
+# ----------------------------------------
+
+# status can be:
+#   OL          : online
+#   OB          : on battery
+upsstatus=$(/bin/upsc $1 ups.status 2>&1 | tail -n 1 | awk '{print $1}')
+
+# second part of status can be:
+#   DISCHRG     : discharging
+#   CHRG        : charging
+upsstatusadd=$(/bin/upsc $1 ups.status 2>&1 | tail -n 1 | awk '{print $2}')
+
+# charge in percent
+upscharge=$(/bin/upsc $1 battery.charge 2>&1 | tail -n 1 | awk '{print $1}')
+
+# alarm on the usp when on battery can be:
+#   enabled
+#   disabled
+upsalarm=$(/bin/upsc $1 ups.beeper.status 2>&1 | tail -n 1 | awk '{print $1}')
+
+# ----------------------------------------
+# ----- CONFIG }}}
+
+
+if [[ ${upsstatus} == "OL" ]] ; then
+    if [[ ${upscharge} -le 25 ]] ; then
+        echo "UPS online. Battery low. Charge at ${upscharge}%"
+        exit 1
+    elif [[ ${upscharge} -le 70 ]] ; then
+        echo "UPS online. Battery not fully charged. Charge at ${upscharge}%"
+        exit 1
+    elif [[ ${upsalarm} == "disabled" ]] ; then
+        echo "UPS online. Alarm DISABLED. Charge at ${upscharge}%"
+        exit 1
+    elif [[ ${upsstatusadd} == "CHRG" ]] ; then
+        echo "UPS online. Charging at ${upscharge}%"
+        exit 0
+    elif [[ ${upsstatusadd} == "DISCHRG" ]] ; then
+        echo "UPS online. Testing charge. Battery at ${upscharge}%"
+        exit 1
+    fi
+elif [[ ${upsstatus} == "OB" ]] ; then
+    echo "UPS on BATTERY! DISCHARGING at ${upscharge}%"
+    exit 2
+else
+    echo "WTF?"
+    exit 3
+fi
