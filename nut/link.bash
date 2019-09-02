@@ -3,5 +3,5 @@
 
 source ../config.bash
 
-cp -fv ${REPOURL}/nut/nut.cfg ${ETCPLUG}/teamspeak3.cfg
-cp -fv ${REPOURL}/nut/check_nut ${PLUGINS}/check_teamspeak3
+cp -fv ${REPOURL}/nut/chec_nut.cfg ${ETCPLUG}/check_nut.cfg
+cp -fv ${REPOURL}/nut/check_nut ${PLUGINS}/check_nut
