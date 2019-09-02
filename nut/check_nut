@@ -42,6 +42,9 @@ if [[ ${upsstatus} == "OL" ]] ; then
     elif [[ ${upsstatusadd} == "DISCHRG" ]] ; then
         echo "UPS online. Testing charge. Battery at ${upscharge}%"
         exit 1
+    else
+        echo "UPS online. Battery fully charged (${upscharge}%)"
+        exit 0
     fi
 elif [[ ${upsstatus} == "OB" ]] ; then
     echo "UPS on BATTERY! DISCHARGING at ${upscharge}%"
@@ -50,3 +53,6 @@ else
     echo "WTF?"
     exit 3
 fi
+
+echo "Something's wrong here"
+exit 3
