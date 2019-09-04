@@ -4,10 +4,11 @@
 # ----- CONFIG {{{
 # ----------------------------------------
 
-# status can be:
+# upsstatus can be:
 #   OL          : online
 #   OB          : on battery
-upsstatus=$(/bin/upsc $1 ups.status 2>&1 | tail -n 1 | awk '{print $1}')
+upsstatus=$(/bin/upsc $1 ups.status 2>&1 | tail -n 1)
+upsstatustwo=$(echo ${upsstatus} | awk '{print $1}')
 
 # second part of status can be:
 #   DISCHRG     : discharging
@@ -25,8 +26,12 @@ upsalarm=$(/bin/upsc $1 ups.beeper.status 2>&1 | tail -n 1 | awk '{print $1}')
 # ----------------------------------------
 # ----- CONFIG }}}
 
+if [[ ${upsstatus} == "Error: Data stale" ]] ; then
+    echo "Data stale, restart required!"
+    exit 1
+fi
 
-if [[ ${upsstatus} == "OL" ]] ; then
+if [[ ${upsstatustwo} == "OL" ]] ; then
     if [[ ${upscharge} -le 25 ]] ; then
         echo "UPS online. Battery low. Charge at ${upscharge}%"
         exit 1
@@ -46,7 +51,7 @@ if [[ ${upsstatus} == "OL" ]] ; then
         echo "UPS online. Battery fully charged (${upscharge}%)"
         exit 0
     fi
-elif [[ ${upsstatus} == "OB" ]] ; then
+elif [[ ${upsstatustwo} == "OB" ]] ; then
     echo "UPS on BATTERY! DISCHARGING at ${upscharge}%"
     exit 2
 else
